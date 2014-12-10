@@ -1,15 +1,20 @@
 #include <stdio.h>
 
-void incrementing(void) {
+void incrementing(void)
+{
         int *intptr=(int*) 0;
 
         char *charptr=(char*) 0;
 
+        void *voidptr=(void*) 0;
+
         printf("Incrementing intptr gives you %p\n", ++intptr);
         printf("Incrementing charptr gives you %p\n", ++charptr);
+        printf("Incrementing voidptr gives you %p\n", ++voidptr);
 }
 
-void deadbeef(void) {
+void deadbeef(void)
+{
         int x=0xdeadbeef;
         int *ptr=&x;
 
@@ -24,7 +29,8 @@ void deadbeef(void) {
         printf("\n");
 }
 
-int main(void) {
+int main(void)
+{
         //nothing to see here.....
         printf("Output of incrementing():\n");
         incrementing();
