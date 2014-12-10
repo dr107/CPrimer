@@ -9,6 +9,7 @@ typedef struct heap {
         //the array that stores the ints
         int *buffer;
         //the number of elements
+        //by the way, you can write unsigned as shorthand for unsigned int
         unsigned int size;
         //the number of elements the buffer can store
         unsigned int cap;
@@ -22,9 +23,8 @@ typedef struct heap {
 heap *heap_new(void);
 
 /*
-  Free a heap. Both buffer and heap itself
+  Free a heap.
  */
-
 void heap_free(heap *h);
 
 /*
