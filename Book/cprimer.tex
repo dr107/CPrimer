@@ -12,6 +12,7 @@
 %TODO talk about valgrind in the memory leak section
 %TODO insert a diagram about pointers and heap vs stack memory
 %TODO finish heap implementation
+%TODO talk about structs getting passed by copy
 
 \title{A C Primer}
 \author{Dan Rohr}
@@ -21,11 +22,13 @@
 
 \chapter*{Preface}
 
-There's a few things I feel I should say before I get into this. First among them is that I am not, by any means, a C expert. I'm not someone who could sit here all day and rattle off all the little subtle differences between K\&R C vs C89 vs C99 vs C11. What I am is a student who has gone, with little formal instruction, from knowing nothing about C and having experience coding in high-level languages like Java and Python, to knowing enough about C to be an effective C expert for a large student engineering project. Why does this give me the credentials to write something like this? Well, because I'm designing this for someone in a a similar position to where I was: a curious student looking to get started with a new kind of programming.
+There's a few things I feel I should say before I get into this. First among them is that I am not, by any means, a C expert. I'm not someone who could sit here all day and rattle off all the little subtle differences between K\&R C vs C89 vs C99 vs C11. What I am is a student who has gone, with little formal instruction, from knowing nothing about C and having experience coding in high-level languages like Java and Python, to knowing enough about C to be an effective C programmer for a large student engineering project. Why does that give me the credentials to write something like this? Well, because I'm designing this for someone in a similar position to where I was: a curious student looking to get started with a new kind of programming.
 
 That said, this is not a beginning programming guide. I expect anyone reading this to at least have some coding experience, ideally in another typed language (like, say, Java), though experience in untyped languages like Python and MATLAB is also ok (it'll just be another new paradigm to get used to). It's also worth noting that most of what I'll be discussing here is going to be stuff that carries well to other low-level languages. So if you're coming here as an expert C++ or Fortran programmer, a lot of this will be redundant.
 
-Another important thing to note about this is that it is not a textbook, and certainly not a complete description of the C programming language. There's about a billion of those already on the market, many of which are written by language designers and implementers who know way more than I do. So if this is an incomplete guide, how are you supposed to learn C? Well here's something they don't teach you in school: being a programmer means being an autodidact. The fact is, outside of maybe your first programming course,  nobody is ever going to sit you down and hold your hand through all the trivial syntatic details of a programming language. So think of this text as more like "guided self-teaching" than a full C course.
+Another important thing to note about this is that it is not a textbook, and certainly not a complete description of the C programming language. There's about a billion of those already on the market, many of which are written by language designers and implementers who know way more than I do. 
+
+So if this is an incomplete guide, how are you supposed to learn C? Here's something they don't teach you in school: being a programmer means being an autodidact. The fact is, outside of maybe your first programming course,  nobody is ever going to sit you down and hold your hand through all the trivial syntatic details of a programming language. So think of this text as more like "guided self-teaching" than a full C course.
 
 What I ask at this point is that you come to this with an open mind. Your first instinct is going to be to try to relate everything you see to something in Java, or whatever language you're most comfortable with. There are plenty times this will not be inappropriate (since C heavily influenced pretty much every widely-used programming language that exists), but there are plenty of times where it will be a very bad idea. Also, forget everything you already know about C (except what's from a textbook or some other serious source). If you read this front to back, you should know what you need to know to move forward, and eventually get a formidable knowledge of this language.
 
@@ -38,7 +41,7 @@ This stuff is mostly environment setup, not actual "exercises." The true coding 
 
 If you're installing Linux, I reccommend using a virtual machine at first, since it gets you up and running faster, though you'll eventually want a native install. I reccommend Oracle's Virtualbox for the virtualization. It's free, and fairly good. As for distribution choice, Ubuntu is a common choice for beginners, though Fedora is just as good. Just make sure to choose one with a graphical installer (stay away from Arch and Gentoo for now). There are a million guides to installing in VMs online, read one. Just make sure your virtual hard drive is not dynamically sized. It saves disk space, but slows down the VM a \textbf{ton}. If your VM is still too slow, most Linux distributions have more lightweight variants, for example XUbuntu and LUbuntu are Ubuntu variants that use more lightweight GUIs.
 
-\item install git on this machine and run the following command in a terminal
+\item install git on this machine and (if you haven't already) run the following command in a terminal
 \begin{verbatim}
 git clone https://github.com/dr107/CPrimer.git 
 \end{verbatim}
@@ -57,16 +60,18 @@ sudo apt-get install build-essential
 
 should get you everything you need. It's a series of developer tool packages that should include everything you need to compile C code.
 
-\item Install a text editor of your choice. For now, do not use an IDE. You won't need the features of one for now; it'll just be confusing. Stick to a plain text editor like \texttt{emacs} or \texttt{vim}. Both have long learning curves, but both are extremely powerful tools. If you don't care about powerful tools, I guess Sublime Text is ok too.
+\item Install a text editor of your choice. For now, do not use an IDE. You won't need the features of one for now; it'll just be confusing. Stick to a plain text editor like \texttt{emacs} or \texttt{vim}. Both have long learning curves, but both are extremely powerful tools. If you don't care about efficiency or being a bamf, I guess Sublime Text is ok too.
 
-\item Read the documentation for the printf function on \url{http://www.cplusplus.com/reference/cstdio/printf/}. It might look a little weird, but just accept the syntax for now. There's examples at the bottom of the page. 
+\item Read the documentation for the printf function on \url{http://www.cplusplus.com/reference/cstdio/printf/}. It might look a little weird, but just accept the syntax for now. There's examples at the bottom of the page.
+
+By the way, that website is a great resource. It's named after C++, but since C++ is (almost) a superset of C, it has documentation for the C standard libraries.
 
 \end{enumerate}
 
 
 \chapter{The Basics}
 \subsection{The spirit of C}
-Every programming language (at any one people actually use) has a reasoning behind its existence. The ANSI C rationale gives the following five tenets as the "Spirit of C"
+Every programming language (at any one people actually use) has a reasoning behind its existence. The ANSI C rationale gives the following five tenets as the ``Spirit of C''
 
 \begin{itemize}
 \item Trust the programmer
@@ -80,15 +85,15 @@ These tenets will begin to make more sense as you do more C programming, but let
 
 \subsection{The C specification}
 
-Before we start, it's worth talking about just what C is in the first place. The C language is defined by a specification, which is a big fat document that rigorously defines what a valid C program is, and what it must do. This standard has evolved over the years since C was first developed in 1972. That's what we mean when we say c99, for example. It refers to the C standard developed in 1999. 
+Before we start, it's worth talking about just what C is in the first place. The C language is defined by a specification, which is a big fat document that rigorously defines what a valid C program is, and what it must do. This standard has evolved over the years since C was first developed in 1972. That's what we mean when we say c99, for example. It refers to the C standard developed in 1999. The code in the examples will be compiled under the C11 standard, since it's the most recent.
 
 The importance of the specification to you, as a programmer, is that the C specification is different from those of high-level programming languages. Throughout this document, and other discussions of C, you'll see words like "unspecified" and "undefined." This refers to places where the C specification simply does not say what should happen. 
 
 For example, we'll talk about arrays later on, but one common source of undefined behavor in C is indexing an array outside of its bounds. The Java specification guarantees that an exception is thrown at runtime when this happens. No C specification guarantees anything of the sort. If you do it, anything might happen. Your operating system's kernel might throw a segmentation fault, or you might just read a value you don't want. Maybe a dragon flies out of your CD tray; C makes no guarantees.
 
-Why is this so? Why wouldn't we want that exception? Well, C is a language that exists for breakneck speed, and the less the spec specifies, the more freedom the language implementer has to make optimizations. For example, if the spec guaranteed an exception for array indexing, the language would have to keep track of things like the size of the array, and be constantly checking for overflow. That's a slowdown. Instead, the onus is on \textbf{you}, the programmer, to ensure that this does not happen.
+Why is this so? Why wouldn't we want that exception? Well, C is a language that exists for breakneck speed, and the less the spec specifies, the more freedom the language implementer has to make optimizations. For example, if the spec guaranteed an exception for array indexing, the language would have to keep track of things like the size of the array, and be constantly checking for overflow every time an element is accessed. That's a slowdown. Instead, the onus is on \textbf{you}, the programmer, to ensure that this does not happen.
 
-Going back to the ANSI rationale, "A standard is a treaty between implementor and programmer."
+Going back to the ANSI rationale, ``A standard is a treaty between implementor and programmer.''
 
 You might want to go and read the introduction to the ANSI rationale. It's not long and pretty informative.
 
@@ -96,7 +101,7 @@ You might want to go and read the introduction to the ANSI rationale. It's not l
 
 Enough philosophical bullshit, it's time to talk about code. C is a stongly typed language, and its primitive data types should be familiar from other languages. You have stuff like int, float, double, and char. Note the abscence of strings. We'll talk about those later. What's a good idea to talk about now, is char. 
 
-If I asked you what a char is, you'd probably say "a character," and you wouldn't be wrong. The way you usually think of a char in a low-level language is more along the lines of "one byte of data." Huh? Well there's this thing called the ASCII character encoding. It maps the numbers 0 through 255, inclusive, to various characters, including all latin letters and arabic numbers, as well as some other symbols and signals. Why 0 through 255? Well, 256 is $2^8$, which means one ASCII character can fit into one byte of data.
+If I asked you what a char is, you'd probably say ``a character,'' and you wouldn't be wrong. The way you usually think of a char in a low-level language is more along the lines of "one byte of data." Huh? Well there's this thing called the ASCII character encoding. It maps the numbers 0 through 255, inclusive, to various characters, including all latin letters and arabic numbers, as well as some other symbols and signals. Why 0 through 255? Well, 256 is $2^8$, which means one ASCII character can fit into one byte of data.
 
 Another interesting thing to note is that there is not explicit booean type. Instead, you use \texttt{int} to represent a boolean value, with 0 being \texttt{false} and anything else being \texttt{true}, for example:
 
@@ -110,7 +115,7 @@ if (1) {
 }
 \end{lstlisting}
 
-The ususal comparison operators (\texttt{==, <, <=}, etc) return ints for this reason.
+The usual comparison operators (\texttt{==, <, <=}, etc) return ints for this reason.
 
 \subsection{Functions}
 For the purposes of this text, there's not much to say about functions in C, at least until we get to linking. First of all, the order you write functions in matters. If $f_2$ calls $f_1$, $f_1$ should be written first. What if they depend on each other? We'll get to that in chapter~\ref{ch:org}.
@@ -124,7 +129,7 @@ void mutate_int(int x)
 }
 \end{lstlisting}
 
-What does this function do? Absolutely nothing. In fact, if you called this function in your code, an optimizing compiler would probably just skip over it completely. Why is that, well, when you call this function on a certain integer, the value of that integer is copied into the local variable x. When you mutate that value, you're only manipulating the local variable, not whatever variable you put in. This is pretty intuitive with integers, but it's also true when you're passing in more complex data, like structs and pointers. We'll see more of that in the sections on those data types.
+What does this function do? Absolutely nothing. In fact, if you called this function in your code, an optimizing compiler would probably just skip over it completely. This is because when you call this function on a certain integer, the value of that integer is copied into the variable x, which is local to the \cf{mutate\_int} function. When you mutate that value, you're only manipulating the local variable, not whatever variable you put in. This is pretty intuitive with integers, but it's also true when you're passing in more complex data, like structs and pointers. We'll see more of that in the sections on those data types.
 
 \subsection{Pointers}
 There's at least one kind of data that you're probably not used to at all. The pointer. This is going to be your first exposure to memory; I hope you're excited.
@@ -134,7 +139,7 @@ There's at least one kind of data that you're probably not used to at all. The p
 
 Memory in operating systems is byte-addressed. That is, each byte of memory available to the system is labelled with a number, which can be used to access the byte of data sitting at that location. A pointer is a variable that stores the memory address of some data, rather than the data itself. 
 
-Take a minute to wrap your head around that. A pointer is just a number, that signifies the location of some piece of data in memory. The marvellous thing is that there really is nothing mysterious about it.
+Take a minute to wrap your head around that. A pointer is just a number, that signifies the location of some piece of data in memory. There really isn't any mystery to it, but they are a fundamental aspect of C programming, and will pervade both this text, and your C career.
 
 \subsubsection{Getting pointers}
 
@@ -224,7 +229,7 @@ These still aren't really coding exercises. At this point, you still don't have 
 
 For extra credit, change COPTS to say \texttt{-std=c89} instead of \cf{-std=c11} in the makefile for that example, recompile and rerun. Now what is returned? This is one of those things that's different accross C standards. The exit value of a \texttt{main} with no return is defined to be 0 in C11, but in C89, it's unspecified. Extra extra extra credit if you can guess why the returned value is what it is... (hint: what does \cf{printf} return?
 
-\item Go into the chapter one folder from the exercises. First of all, do a \texttt{make ex1} and note that it compiles without any warnings. Check out they type signature of the function. Did you read the footnote from before? Anyways, alter \texttt{mutate\_int} so that it actually sets the value of an integer to 5. \textit{Hint:} What type should the input be?
+\item Go into the \cf{Examples/CH1} directory. First of all, do a \texttt{make ex1} and note that it compiles without any warnings. Check out they type signature of the function. Did you read the footnote from before? Anyways, alter \texttt{mutate\_int} so that it actually sets the value of an integer to 5. \textit{Hint:} What type should the input be?
 
 \item Another research project. What is endianness? Based on the output of \texttt{arith.o}, what is the endianness of your current setup? Stuff like this is why working with bits and bytes gets really, really confusing.
 \end{enumerate}
@@ -521,17 +526,19 @@ void g(void) {
 \end{lstlisting}
 
 
-Now with that in mind, check out \cf{minheap.c}. Guess what it implements. That's right, a min heap of integers! I then use it to implement good 'ol heapsort. Use it as an example for the exercises.\footnote{I know the code looks awful. We need to learn about the preprocessor before we can properly organize the cod} Speaking of which....
-
-% try coding an array-backed heap for examples using realloc and stuff
+Now with that in mind, check out \cf{minheap.c}. Guess what it implements. That's right, a min heap of integers! I then use it to implement good 'ol heapsort. Use it as an example for the exercises.\footnote{I know the code looks awful. We need to learn about the preprocessor before we can properly organize the code}. Note the only functions declared at the top are the ones an outside caller of this code would want to call, leaving helper functions buried in the implementation. We'll come back to this idea. I swear I'll eventually explain how to organize code.
 
 \subsection{Exercises}
 
 This is where the shit hits the fan. Seriously, I'm worried about how people will do when they get here, since it's mostly a test of my skill as a teacher. It's time for you to sit down, and code some nontrivial stuff in C. Here you are likely going to experience your first segfaults. Please refer to the appendix section on debugging for help there. Good luck, have fun, don't feed.
 
+\noindent
+By the way, those who have taken CS3410 at Cornell might find some of the following exercises familliar.
+
 \begin{enumerate}
 
-\item optimize the heap interface to only do one malloc/realloc call
+\item When you run my heap program, you'll find that the heap prints a message when its buffer is full and it needs to \cf{realloc}. I said earlier that dynamic memory allocation is slow. Change the heap's interface so that no matter how large \cf{num\_elems} gets, calls to \cf{heapsort} never has to call \cf{realloc}.
+
 % mention calloc, realloc, memmove, memset
 \item arraylist. Use \cf{void*}. It's as close as you're gonna get to polymorphism without doing some more complex stuff like tagged unions (google it)
 

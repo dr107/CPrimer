@@ -1,5 +1,5 @@
 CC=gcc
-COPTS=-Wall -Wextra -ggdb
+COPTS=-Wall -Wextra -std=c11
 
 EXEC1=deref.o
 SRC_DEREF=deref.c
@@ -10,7 +10,10 @@ SRC_ARITH=arith.c
 EXEC3=hanging.o
 SRC_HANGING=hanging.c
 
-all: deref arith hanging
+SRC_EX1=ex1.c
+EXEC4=ex1.o
+
+all: deref arith hanging ex1
 
 deref:
 	$(CC) $(COPTS) -o $(EXEC1) $(SRC_DEREF)
@@ -20,3 +23,6 @@ arith:
 
 hanging:
 	$(CC) $(COPTS) -o $(EXEC3) $(SRC_HANGING)
+
+ex1:
+	$(CC) $(COPTS) -o $(EXEC4) $(SRC_EX1)

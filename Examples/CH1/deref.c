@@ -37,4 +37,5 @@ int main(void) {
         mutate_int(x);
         printf("\n\n");
         printf("After noop call x=%d != 5\n", x);
+	return 0;
 }
