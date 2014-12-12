@@ -610,7 +610,11 @@ Note that your arraylist is going to store elements of type \cf{void*}. Since an
 
 Put your tests in \cf{main}. Make sure you have tests that cause the arraylist's size to double. Also, make sure to run the tests in \cf{valgrind} or a similar tool to check for memory leaks.
 
-\item hashtable. first no rehash, then rehash. No boilerplate code.
+\item Training wheels are coming off. Use your \cf{arraylist} implementation to implement a hashtable with chaining. Have it map from \cf{void*} to \cf{void*}. No boilerplate code, nothing in the \cf{Makefile}. Figure it out.
+
+Include your arraylist by just copying and pasting the contents of \cf{arraylist.c} (except for the \cf{main} function) into your new file, and proceeding from there. Some advice: first implement a hashtable with a fixed number of buckets. When you have that working, then implement rehashing/resizing.
+
+Again, make sure to use \cf{valgrind} to test for memory leaks.
 
 \end{enumerate}
 
