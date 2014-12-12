@@ -41,7 +41,8 @@ void heap_push(heap *h, int x);
 int heap_pop(heap *h);
 
 /*
-  Print an array of integers at least num_elements long
+  Print an array of integers. Requires that arr have at least num_elements
+  elements
  */
 void print_intarr(int *arr, int num_elems);
 
@@ -84,7 +85,7 @@ void heap_free(heap *h)
 
 void heap_dbl(heap *h)
 {
-        printf("Size=%d, Cap=%d, we have to realloc with twice the size\n",
+        printf("Size=%d, Cap=%d, we have to call realloc to make room\n",
                h->size, h->cap);
         h->cap*=2;
         h->buffer=realloc(h->buffer, h->cap*sizeof(int));
@@ -118,8 +119,7 @@ void heap_push(heap *h, int x)
         if (h->size == h->cap) {
                 heap_dbl(h);
         }
-        h->buffer[h->size]=x;
-        h->size++;
+        h->buffer[h->size++]=x;
         bubble_up(h, h->size-1);
 }
 
@@ -193,10 +193,6 @@ void heapsort(int *arr, int num_elems) {
         heap_free(h);
 }
 
-/*
-  Print an array of integers. Requires that arr have at least num_elements
-  elements
- */
 void print_intarr(int *arr, int num_elems) {
         for(int i=0; i<num_elems; i++) {
                 printf("%d ", arr[i]);
@@ -238,6 +234,7 @@ int main(void) {
         int *arr=genarr(100);
         printf("Initial array:\n");
         print_intarr(arr, 100);
+	printf("\n");
 
         heapsort(arr, 100);
 
