@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-/*
+#include <time.h>
+
+/*******************************************************************************
   Here be declarations.....
- */
+
+  these are the functions that an outside caller might wish to call
+*******************************************************************************/
 
 typedef struct heap {
         //the array that stores the ints
@@ -17,7 +21,7 @@ typedef struct heap {
 
 /*
   Initialize a new heap of ten elements.
-
+*
   Heap-allocates (lol) both the new heap itself and the buffer
  */
 heap *heap_new(void);
@@ -56,10 +60,10 @@ void print_intarr(int *arr, int num_elems);
   and frees memory for its heap.
  */
 void heapsort(int *arr, int num_elems);
-/*
-  End declarations, here be implementations...
- */
 
+/*******************************************************************************
+  now the implementations...
+*******************************************************************************/
 
 void arr_swap(int* arr, int i, int j) {
         int tmp=arr[i];
@@ -178,9 +182,6 @@ int heap_pop(heap *h) {
 }
 
 
-/*
-  Sort an array of numbers. Arr must be at least num_elems long
- */
 void heapsort(int *arr, int num_elems) {
         int i;
         heap *h=heap_new();
@@ -231,16 +232,25 @@ int *genarr(unsigned siz) {
 }
 
 int main(void) {
-        int *arr=genarr(100);
+        clock_t t0, t1;
+        float t;
+        const unsigned num_elems=1000;
+        int *arr=genarr(num_elems);
         printf("Initial array:\n");
-        print_intarr(arr, 100);
-	printf("\n");
+        print_intarr(arr, num_elems);
+        printf("\n");
 
-        heapsort(arr, 100);
+        t0 = clock();
+        heapsort(arr, num_elems);
+        t1 = clock();
+
 
         printf("\nFinal array:\n");
-        print_intarr(arr, 100);
+        print_intarr(arr, num_elems);
 
+        printf("\n\n");
+        t = (((float) t1) - ((float) t0))/((float) CLOCKS_PER_SEC);
+        printf("The sort operation took %f seconds\n", t);
         //don't forget to free!
         free(arr);
         return 0;

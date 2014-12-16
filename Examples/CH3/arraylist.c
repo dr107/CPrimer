@@ -21,7 +21,7 @@ typedef struct arraylist {
 /*
   Allocate a new arraylist with the specified capacity.
 
-  Requires that the initial capac
+  Requires that the initial capacity be >0.
  */
 arraylist *arraylist_new(unsigned init_cap);
 
@@ -29,6 +29,15 @@ arraylist *arraylist_new(unsigned init_cap);
   Completely free an arraylist
  */
 void arraylist_free(arraylist *a);
+
+/*
+  Get the ith element of the arraylist
+
+  Does not mutate the arraylist. If i is out of bounds,
+  print a message to stderr, and return NULL.
+ */
+void *arraylist_get(arraylist *a, unsigned i);
+
 
 /*
   Put an element at the end of the arraylist.
@@ -53,6 +62,13 @@ void arraylist_insert(arraylist *a, void *x, unsigned i);
   Does not mutate the arraylist
  */
 void *arraylist_get(arraylist *a, unsigned i);
+
+unsigned arraylist_find(arraylist *a, void *x);
+
+/*
+  The opposite of insert. Remove the ith element.
+ */
+void arraylist_remove(arraylist *a, unsigned i);
 
 /*******************************************************************************
   End declarations. Put your implementations of the above functions,
