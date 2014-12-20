@@ -63,7 +63,12 @@ void arraylist_insert(arraylist *a, void *x, unsigned i);
  */
 void *arraylist_get(arraylist *a, unsigned i);
 
-unsigned arraylist_find(arraylist *a, void *x);
+/*
+  Find the first occurence of x in the arraylist.
+
+  Return -1 as the "not found" signal
+ */
+int arraylist_find(arraylist *a, void *x);
 
 /*
   The opposite of insert. Remove the ith element.
@@ -82,6 +87,10 @@ void arraylist_remove(arraylist *a, unsigned i);
 arraylist *arraylist_new(unsigned init_cap)
 {
         if (init_cap==0) {
+                /*
+                  This function prints to stderr instead of stdout.
+                  Feel free to copy this function call.
+                 */
                 fprintf(stderr,
                         "ERR: You can't have an arraylist with zero size\n");
                 /*

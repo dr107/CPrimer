@@ -1,6 +1,9 @@
 CC=gcc
 COPTS=-Wall -Wextra -std=c11
 
+EXEC5=global.o
+SRC_GLOBAL=global.c
+
 EXEC1=deref.o
 SRC_DEREF=deref.c
 
@@ -13,7 +16,10 @@ SRC_HANGING=hanging.c
 SRC_EX1=ex1.c
 EXEC4=ex1.o
 
-all: deref arith hanging ex1
+all: global deref arith hanging ex1
+
+global:
+	$(CC) $(COPTS) -o $(EXEC5) $(SRC_GLOBAL)
 
 deref:
 	$(CC) $(COPTS) -o $(EXEC1) $(SRC_DEREF)
