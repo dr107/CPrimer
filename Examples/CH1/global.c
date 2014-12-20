@@ -9,7 +9,6 @@ void incr_local(void)
 int count=0;
 void incr_global(void)
 {
-        printf("y=%d\n", y);
         printf("Global count=%d\n", count++);
 }
 
