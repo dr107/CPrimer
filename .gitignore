@@ -4,3 +4,10 @@ TODO
 
 *.aux
 *.log
+*.tex
+*.bbl
+*.blg
+*.dvi
+*.swp
+bibliography
+buildtex.sh
